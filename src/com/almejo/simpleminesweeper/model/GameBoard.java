@@ -3,7 +3,7 @@ package com.almejo.simpleminesweeper.model;
 import java.util.Random;
 
 public class GameBoard {
-			
+
 	Cell[][] cells = new Cell[8][8];
 
 	public GameBoard() {
@@ -149,5 +149,13 @@ public class GameBoard {
 			}
 		}
 		return count;
+	}
+
+	public void openAll() {
+		for (int y = 0; y < 8; y++) {
+			for (int x = 0; x < 8; x++) {
+				cells[x][y].open = true;
+			}
+		}
 	}
 }

@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -106,6 +107,7 @@ public class BoardPanel extends JPanel {
 		}
 		gameBoard.open(x, y);
 		if (gameBoard.hasMine(x, y)) {
+			gameBoard.openAll();
 			changeStatus(GameStatus.LOSE);
 		} else if (gameBoard.allOpen()) {
 			changeStatus(GameStatus.WIN);
@@ -134,10 +136,12 @@ public class BoardPanel extends JPanel {
 				if (gameBoard.isClosed(x, y)) {
 					drawSlab(graphics2D, deltaX, deltaY);
 					if (gameBoard.isFlagged(x, y)) {
-						drawFlag(graphics2D, deltaX, deltaY);
+						drawFlag(graphics2D, deltaX, deltaY, true);
 					}
 				} else if (gameBoard.hasMine(x, y)) {
 					drawMine(graphics2D, deltaX, deltaY);
+				} else if (gameBoard.isFlagged(x, y)) {
+					drawFlag(graphics2D, deltaX, deltaY, false);
 				} else {
 					int hintCount = gameBoard.getHintCount(x, y);
 					if (hintCount > 0) {
@@ -155,22 +159,43 @@ public class BoardPanel extends JPanel {
 	}
 
 	private void drawSlab(Graphics2D graphics2D, int deltaX, int deltaY) {
+		Color color = graphics2D.getColor();
+		graphics2D.setColor(Color.LIGHT_GRAY);
+		Polygon polygon = new Polygon();
+		polygon.addPoint(deltaX, deltaY + 30);
+		polygon.addPoint(deltaX + 30, deltaY);
+		polygon.addPoint(deltaX + 30, deltaY + 30);
+		graphics2D.fillPolygon(polygon);
+		graphics2D.drawLine(deltaX, deltaY, deltaX + 30, deltaY + 30);
+		graphics2D.fillRect(deltaX + 5, deltaY + 5, 20, 20);
+		graphics2D.setColor(Color.GRAY);
 		graphics2D.drawRect(deltaX + 5, deltaY + 5, 20, 20);
+		graphics2D.setColor(color);
 	}
 
 	private void drawMine(Graphics2D graphics2D, int x, int y) {
 		Color color = graphics2D.getColor();
 		graphics2D.setColor(Color.BLACK);
-		graphics2D.fillOval(x + 7, y + 7, 16, 16);
+		graphics2D.fillOval(x + 13, y + 4, 4, 25);
+		graphics2D.fillOval(x + 4, y + 13, 25, 4);
+		graphics2D.fillOval(x + 7, y + 7, 17, 17);
+		graphics2D.setColor(Color.DARK_GRAY);
+		graphics2D.drawOval(x + 13, y + 13, 4, 4);
 		graphics2D.setColor(color);
 	}
 
-	private void drawFlag(Graphics2D graphics2D, int x, int y) {
+	private void drawFlag(Graphics2D graphics2D, int x, int y, boolean rightPlaced) {
 		Color color = graphics2D.getColor();
+		if (!rightPlaced) {
+			graphics2D.setColor(Color.ORANGE);
+			graphics2D.fillRect(x, y, 30, 30);
+		}
 		graphics2D.setColor(Color.BLACK);
 		graphics2D.drawLine(x + 15, y + 5, x + 15, y + 22);
 		graphics2D.setColor(Color.RED);
 		graphics2D.fillRect(x + 15, y + 7, 8, 5);
+		graphics2D.setColor(Color.BLACK);
+		graphics2D.drawRect(x + 15, y + 7, 8, 5);
 		graphics2D.setColor(color);
 	}
 
